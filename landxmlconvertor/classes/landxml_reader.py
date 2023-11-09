@@ -21,6 +21,16 @@ class LandXMLReader:
     def xml_root(self) -> ET.Element:
         return self.xml_tree.getroot()
 
+    @property
+    def surface_count(self) -> int:
+        return len(self.surfaces)
+
+    def get_surface_points(self, surface_number: int) -> typing.List[MeshVertex]:
+        return self.surfaces[surface_number].points
+
+    def get_surface_faces(self, surface_number: int) -> typing.List[MeshFace]:
+        return self.surfaces[surface_number].faces
+
     def _get_surfaces(self) -> None:
         surfaces = self.xml_root.find("landxml:Surfaces", namespaces=NS)
         if surfaces:
