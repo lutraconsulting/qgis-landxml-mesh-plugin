@@ -10,6 +10,7 @@ from .mesh_elements import MeshFace, MeshVertex
 class LandXMLReader:
     """Class for reading the LandXML file, store individual surfaces."""
 
+    # different surfaces may use same vertex ids, we need to differentiate so surfaces are offset from each other by this value
     SURFACE_VERTEX_ID_OFFSET = 10_000
 
     def __init__(self, path: str):
