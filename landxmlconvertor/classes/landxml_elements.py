@@ -55,7 +55,3 @@ class LandXMLSurface:
 
     def as_2dm(self) -> str:
         return f"MESH2D\n{self.points_as_2dm()}\n{self.faces_as_2dm()}"
-
-    def save_to_file(self, file_name: str) -> None:
-        with open(file_name, "w+", encoding="utf-8") as file:
-            file.write(self.as_2dm())
