@@ -26,7 +26,7 @@ class MeshVertex:
     def from_xml_element(cls, element: ET.Element, id_prefix: int = None):
         """Read from LandXML element."""
         if id_prefix is None:
-            vertex_id = element.attrib["id"]
+            vertex_id = int(element.attrib["id"])
         else:
             vertex_id = id_prefix + int(element.attrib["id"])
 
