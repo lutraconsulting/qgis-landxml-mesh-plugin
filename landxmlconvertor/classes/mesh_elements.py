@@ -32,13 +32,17 @@ class MeshVertex:
 
         y, x, z = element.text.split(" ")
 
+        x = float(x)
+        y = float(y)
+        z = float(z)
+
         return cls(vertex_id, x, y, z)
 
     @classmethod
     def from_2dm_line(cls, line: str):
         """Read from 2DM line."""
         elements = re.split(r"\s", line)
-        return cls(elements[1], elements[2], elements[3], elements[4])
+        return cls(int(elements[1]), float(elements[2]), float(elements[3]), float(elements[4]))
 
 
 class MeshFace:
