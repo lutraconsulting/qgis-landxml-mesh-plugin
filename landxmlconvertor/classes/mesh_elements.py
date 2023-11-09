@@ -48,7 +48,7 @@ class MeshVertex:
 class MeshFace:
     """Mesh face that is defined by unique id and list of ids of mesh verticies."""
 
-    def __init__(self, face_id: int, points_ids: typing.List[str]) -> None:
+    def __init__(self, face_id: int, points_ids: typing.List[int]) -> None:
         self.id = face_id
         self.points_ids = points_ids
 
@@ -72,18 +72,19 @@ class MeshFace:
         return elem
 
     @classmethod
-    def from_xml_element(cls, face_id, face_element: ET.Element, id_prefix: int = None):
+    def from_xml_element(cls, face_id: int, face_element: ET.Element, id_prefix: int = 0):
         """Read from LandXML element."""
-        if id_prefix is not None:
-            face_id = face_id + id_prefix
 
-        points_ids = face_element.text.split(" ")
+        face_id = face_id + id_prefix
 
-        if id_prefix:
-            for i, point_id in enumerate(points_ids):
-                points_ids[i] = id_prefix + int(point_id)
+        points_ids_text = face_element.text.split(" ")
 
-        return cls(face_id, points_ids)
+        point_ids: typing.List[int] = []
+
+        for point_id in points_ids_text:
+            point_ids.append(id_prefix + int(point_id))
+
+        return cls(face_id, point_ids)
 
     @classmethod
     def from_2dm_line(cls, line: str):
@@ -91,6 +92,6 @@ class MeshFace:
         elements = re.split(r"\s", line)
 
         if line.startswith("E3T"):
-            return cls(int(elements[1]), [elements[2], elements[3], elements[4]])
+            return cls(int(elements[1]), [int(elements[2]), int(elements[3]), int(elements[4])])
         elif line.startswith("E4Q"):
-            return cls(int(elements[1]), [elements[2], elements[3], elements[4], elements[5]])
+            return cls(int(elements[1]), [int(elements[2]), int(elements[3]), int(elements[4]), int(elements[5])])
