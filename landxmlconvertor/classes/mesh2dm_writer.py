@@ -16,6 +16,6 @@ class Mesh2DMWriter:
 
         return f"MESH2D\n{str_points}\n{str_faces}"
 
-    def save_to_2dm_file(self, file_name: str) -> None:
+    def write(self, file_name: str) -> None:
         with open(file_name, "w+", encoding="utf-8") as file:
             file.write(self._as_2dm_string())
