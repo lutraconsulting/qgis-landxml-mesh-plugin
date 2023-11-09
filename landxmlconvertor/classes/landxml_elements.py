@@ -8,13 +8,10 @@ from .mesh_elements import MeshFace, MeshVertex
 class LandXMLSurface:
     """Class for reading individual surface from LandXML"""
 
-    def __init__(self, surface: ET.Element, id_prefix: int = None) -> None:
+    def __init__(self, surface: ET.Element, id_prefix: int = 0) -> None:
         self.surface = surface
         self.name = self.surface.attrib["name"]
-        if id_prefix is None:
-            self.id_prefix = 0
-        else:
-            self.id_prefix = id_prefix
+        self.id_prefix = int(id_prefix)
 
         self.points: typing.List[MeshVertex] = []
         self._get_points()
