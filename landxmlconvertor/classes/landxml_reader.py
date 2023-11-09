@@ -10,6 +10,8 @@ from .mesh_elements import MeshFace, MeshVertex
 class LandXMLReader:
     """Class for reading the LandXML file, store individual surfaces."""
 
+    SURFACE_VERTEX_ID_OFFSET = 10_000
+
     def __init__(self, path: str):
         self.path = path
         self.xml_tree = ET.parse(self.path)
@@ -35,7 +37,7 @@ class LandXMLReader:
         surfaces = self.xml_root.find("landxml:Surfaces", namespaces=NS)
         if surfaces:
             for i, surface in enumerate(surfaces):
-                self.surfaces.append(LandXMLSurface(surface, i * 1000))
+                self.surfaces.append(LandXMLSurface(surface, i * self.SURFACE_VERTEX_ID_OFFSET))
 
     @property
     def all_points(self) -> typing.List[MeshVertex]:
