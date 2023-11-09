@@ -80,7 +80,7 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
 
         mesh_2dm_writer = Mesh2DMWriter(land_xml.all_points, land_xml.all_faces)
 
-        mesh_2dm_writer.save_to_2dm_file(tmp_2dm_file)
+        mesh_2dm_writer.write(tmp_2dm_file)
 
         mesh_layer = QgsMeshLayer(tmp_2dm_file, "temp mesh layer", "mdal")
 
