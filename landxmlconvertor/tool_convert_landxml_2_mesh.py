@@ -82,6 +82,8 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
 
         mesh_2dm_writer.write(tmp_2dm_file)
 
+        feedback.pushInfo(f"Temp 2dm file saved: {tmp_2dm_file}")
+
         mesh_layer = QgsMeshLayer(tmp_2dm_file, "temp mesh layer", "mdal")
 
         # if output is 2DM format, just copy
