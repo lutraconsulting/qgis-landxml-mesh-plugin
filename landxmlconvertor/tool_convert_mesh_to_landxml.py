@@ -1,15 +1,14 @@
 import typing
-import uuid
 
 from qgis.core import (
-    QgsMesh,
+    QgsProcessing,
     QgsProcessingAlgorithm,
     QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingFeedback,
     QgsProcessingParameterFileDestination,
     QgsProcessingParameterMeshLayer,
-    QgsProcessingUtils,
+    QgsProcessingParameterMultipleLayers,
     QgsProviderRegistry,
 )
 
@@ -33,7 +32,9 @@ class ConvertMesh2LandXML(QgsProcessingAlgorithm):
         return ConvertMesh2LandXML()
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterMeshLayer(self.INPUT, "Input Mesh Layer"))
+        self.addParameter(
+            QgsProcessingParameterMultipleLayers(self.INPUT, "Input Mesh Layers", QgsProcessing.SourceType.TypeMesh)
+        )
 
         self.addParameter(
             QgsProcessingParameterFileDestination(self.OUTPUT, "Output LandXML File", fileFilter="XML File (*.xml)")
@@ -42,23 +43,15 @@ class ConvertMesh2LandXML(QgsProcessingAlgorithm):
     def processAlgorithm(
         self, parameters: typing.Dict[str, typing.Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ):
-        mesh_layer = self.parameterAsMeshLayer(parameters, self.INPUT, context)
+        mesh_layers = self.parameterAsLayerList(parameters, self.INPUT, context)
 
         xml_file = self.parameterAsString(parameters, self.OUTPUT, context)
 
-        tmp_2dm_file = QgsProcessingUtils.generateTempFilename(f"{uuid.uuid4()}.2dm")
+        landxml_writer = LandXMLWriter()
 
-        # create temp 2D file
-        mesh = QgsMesh()
-        mesh_layer.dataProvider().populateMesh(mesh)
+        for mesh_layer in mesh_layers:
+            landxml_writer.add_surface(mesh_layer)
 
-        self.mdal_provider_meta.createMeshData(mesh=mesh, fileName=tmp_2dm_file, driverName="2DM", crs=mesh_layer.crs())
-
-        # read the file to format, that holds points and faces
-        mesh_2dm_reader = Mesh2DMReader(tmp_2dm_file)
-
-        # write the points and faces and LandXML
-        landxml_writer = LandXMLWriter(mesh_2dm_reader.points, mesh_2dm_reader.faces)
         landxml_writer.write(xml_file)
 
         return {self.OUTPUT: xml_file}
