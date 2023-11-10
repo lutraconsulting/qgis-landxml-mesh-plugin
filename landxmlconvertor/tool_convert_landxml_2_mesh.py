@@ -105,6 +105,14 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
 
         land_xml = LandXMLReader(landxml_file)
 
+        land_xml_crs = land_xml.crs()
+
+        # if user inputed CRS is not valid (empty CRS) use CRS from LandXML
+        if land_xml_crs.isValid() and not mesh_crs.isValid():
+            mesh_crs = land_xml_crs
+
+        feedback.pushInfo(f"Using CRS: `{mesh_crs.authid()}`.")
+
         if merge_surfaces:
             name, _ = os.path.splitext(landxml_file)
             mesh_file = QgsFileUtils.ensureFileNameHasExtension(name, [self.driver_suffixes[driverIndex]])
