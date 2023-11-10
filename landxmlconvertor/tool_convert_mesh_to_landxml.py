@@ -62,9 +62,14 @@ class ConvertMesh2LandXML(QgsProcessingAlgorithm):
 
         xml_file = self.parameterAsString(parameters, self.OUTPUT, context)
 
-        landxml_writer = LandXMLWriter()
+        landxml_writer = LandXMLWriter(mesh_layers[0].crs())
 
         for mesh_layer in mesh_layers:
+            if feedback.isCanceled():
+                break
+
+            feedback.pushCommandInfo(f"Processing layer: {mesh_layer.name()}")
+
             landxml_writer.add_surface(mesh_layer)
 
         landxml_writer.write(xml_file)
