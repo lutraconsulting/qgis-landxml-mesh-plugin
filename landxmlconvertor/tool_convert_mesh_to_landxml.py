@@ -23,10 +23,10 @@ class ConvertMesh2LandXML(QgsProcessingAlgorithm):
     mdal_provider_meta = QgsProviderRegistry.instance().providerMetadata("mdal")
 
     def name(self):
-        return "convertmeshtolandxmlsurfaces"
+        return "convertmeshestolandxmlsurfaces"
 
     def displayName(self):
-        return "Convert Mesh to LandXML Surfaces"
+        return "Convert Meshes to LandXML Surfaces"
 
     def createInstance(self):
         return ConvertMesh2LandXML()
