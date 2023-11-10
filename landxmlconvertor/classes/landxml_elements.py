@@ -1,3 +1,4 @@
+import copy
 import typing
 import xml.etree.ElementTree as ET
 
@@ -28,6 +29,26 @@ class LandXMLSurface:
     @property
     def _definition(self) -> ET.Element:
         return self.surface.find("landxml:Definition", namespaces=NS)
+
+    def points(self, add_id_offset: bool = False) -> typing.List[MeshVertex]:
+        """Returns deep copy of the vertices"""
+        points = copy.deepcopy(self._points)
+        if add_id_offset is False:
+            return points
+        else:
+            for point in points:
+                point.apply_id_offset(self.id_offset)
+            return points
+
+    def faces(self, add_id_offset: bool = False) -> typing.List[MeshFace]:
+        """Returns deep copy of the faces"""
+        faces = copy.deepcopy(self._faces)
+        if add_id_offset is False:
+            return faces
+        else:
+            for face in faces:
+                face.apply_vertices_id_offset(self.id_offset)
+            return faces
 
     def _get_points(self) -> None:
         if not self._definition:
