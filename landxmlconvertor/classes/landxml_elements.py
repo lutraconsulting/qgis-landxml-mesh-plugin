@@ -72,4 +72,15 @@ class LandXMLSurface:
             return
 
         for i, face_element in enumerate(faces.findall("landxml:F", namespaces=NS)):
+            attrs = face_element.attrib
+            if "i" in attrs.keys():
+                try:
+                    i_value = int(attrs["i"])
+                except ValueError:
+                    # atrribute cannot be converted to int and we expect its value to be 0
+                    i_value = 0
+
+                if i_value == 1:
+                    continue
+
             self._faces.append(MeshFace.from_xml_element(i + 1, face_element))
