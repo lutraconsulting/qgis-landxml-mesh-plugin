@@ -88,15 +88,8 @@ class LandXMLWriter:
 
         return ET.Element("Application", attrib=attr)
 
-    def create_surfaces(self) -> ET.Element:
-        elem = ET.Element("Surfaces")
-
-        elem.append(self.create_surface())
-
-        return elem
-
-    def create_surface(self) -> ET.Element:
-        elem_surface = ET.Element("Surface", attrib={"name": "A"})
+    def _create_surface(self, name: str, points: typing.List[MeshVertex], faces: typing.List[MeshFace]) -> ET.Element:
+        elem_surface = ET.Element("Surface", attrib={"name": name})
 
         elem_definition = ET.Element("Definition", attrib={"surfType": "TIN"})
         elem_surface.append(elem_definition)
@@ -104,13 +97,13 @@ class LandXMLWriter:
         elem_pnts = ET.Element("Pnts")
         elem_definition.append(elem_pnts)
 
-        for point in self.points:
+        for point in points:
             elem_pnts.append(point.as_landxml_element())
 
         elem_faces = ET.Element("Faces")
         elem_definition.append(elem_faces)
 
-        for face in self.faces:
+        for face in faces:
             elem_faces.append(face.as_landxml_element())
 
         return elem_surface
