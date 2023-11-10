@@ -2,6 +2,8 @@ import datetime
 import typing
 import xml.etree.ElementTree as ET
 
+from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsUnitTypes
+
 from ..text_constants import TextConstants
 from ..utils import plugin_author, plugin_repository_url, plugin_version
 from .mesh_elements import MeshFace, MeshVertex
@@ -46,18 +48,32 @@ class LandXMLWriter:
         return self.root_element
 
     def create_unit(self) -> ET.Element:
-        atrr = {
-            "areaUnit": "squareMeter",
-            "linearUnit": "meter",
-            "volumeUnit": "cubicMeter",
-            "temperatureUnit": "celsius",
-            "pressureUnit": "milliBars",
-            "diameterUnit": "millimeter",
-            "angularUnit": "decimal degrees",
-            "directionUnit": "decimal degrees",
-        }
+        unit_type = "Metric"
+        attr = {}
 
-        return ET.Element("Metric", attrib=atrr)
+        if self.crs.isValid():
+            distance_unit = self.crs.mapUnits()
+
+            if distance_unit != Qgis.DistanceUnit.Unknown:
+                if distance_unit in [
+                    Qgis.DistanceUnit.Feet,
+                    Qgis.DistanceUnit.Inches,
+                    Qgis.DistanceUnit.Miles,
+                    Qgis.DistanceUnit.NauticalMiles,
+                    Qgis.DistanceUnit.Yards,
+                ]:
+                    unit_type = "Imperial"
+
+                attr = {
+                    "linearUnit": QgsUnitTypes.encodeUnit(distance_unit),
+                    "areaUnit": QgsUnitTypes.encodeUnit(QgsUnitTypes.distanceToAreaUnit(distance_unit)),
+                    "volumeUnit": QgsUnitTypes.encodeUnit(QgsUnitTypes.distanceToVolumeUnit(distance_unit)),
+                    "diameterUnit": "millimeter",
+                    "angularUnit": "decimal degrees",
+                    "directionUnit": QgsUnitTypes.encodeUnit(distance_unit),
+                }
+
+        return ET.Element(unit_type, attrib=attr)
 
     def create_application(self) -> ET.Element:
         attr = {
