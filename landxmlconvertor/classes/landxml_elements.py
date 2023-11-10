@@ -19,10 +19,10 @@ class LandXMLSurface:
 
         self.id_prefix = int(id_prefix)
 
-        self.points: typing.List[MeshVertex] = []
+        self._points: typing.List[MeshVertex] = []
         self._get_points()
 
-        self.faces: typing.List[MeshFace] = []
+        self._faces: typing.List[MeshFace] = []
         self._get_faces()
 
     @property
@@ -39,7 +39,7 @@ class LandXMLSurface:
             return
 
         for point_element in points.findall("landxml:P", namespaces=NS):
-            self.points.append(MeshVertex.from_xml_element(point_element, self.id_prefix))
+            self._points.append(MeshVertex.from_xml_element(point_element))
 
     def _get_faces(self) -> None:
         if not self._definition:
@@ -51,4 +51,4 @@ class LandXMLSurface:
             return
 
         for i, face_element in enumerate(faces.findall("landxml:F", namespaces=NS)):
-            self.faces.append(MeshFace.from_xml_element(i + 1, face_element, self.id_prefix))
+            self._faces.append(MeshFace.from_xml_element(i + 1, face_element))
