@@ -17,7 +17,11 @@ class LandXMLReader:
 
     def __init__(self, path: str):
         self.path = path
+
         self.xml_tree = ET.parse(self.path)
+
+        if not "LandXML".lower() in self.xml_root.tag.lower():
+            raise ValueError("Not a valid LandXML file.")
 
         self.surfaces: typing.List[LandXMLSurface] = []
         self._get_surfaces()
