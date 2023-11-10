@@ -11,9 +11,16 @@ from .xml_formatter import XmlFormatter
 class LandXMLWriter:
     """Class for writing the LandXML format from mesh vericies and faces."""
 
-    def __init__(self, points: typing.List[MeshVertex], faces: typing.List[MeshFace]) -> None:
+    def __init__(
+        self,
+        points: typing.List[MeshVertex],
+        faces: typing.List[MeshFace],
+        crs: QgsCoordinateReferenceSystem = QgsCoordinateReferenceSystem(),
+    ) -> None:
         self.points = points
         self.faces = faces
+
+        self.crs = crs
 
         self.root_element = ET.Element(
             "LandXML",
