@@ -45,10 +45,10 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
             driver_suffixes.append(driver.writeMeshFrameOnFileSuffix())
 
     def name(self):
-        return "convertlandxmlsurfacestomesh"
+        return "convertlandxmlsurfacestomeshes"
 
     def displayName(self):
-        return "Convert LandXML Surfaces to Mesh"
+        return "Convert LandXML Surfaces to Meshes"
 
     def createInstance(self):
         return ConvertLandXML2Mesh()
