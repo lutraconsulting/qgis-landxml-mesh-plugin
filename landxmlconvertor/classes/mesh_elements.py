@@ -22,6 +22,9 @@ class MeshVertex:
         elem.text = f"{self.y} {self.x} {self.z}"
         return elem
 
+    def apply_id_offset(self, id_offset: int) -> None:
+        self.id = self.id + id_offset
+
     @classmethod
     def from_xml_element(cls, element: ET.Element):
         """Read from LandXML element."""
@@ -49,6 +52,11 @@ class MeshFace:
     def __init__(self, face_id: int, points_ids: typing.List[int]) -> None:
         self.id = face_id
         self.points_ids = points_ids
+
+    def apply_vertices_id_offset(self, offset: int) -> None:
+        """Offsets id of vertices by given number."""
+        self.id = self.id + offset
+        self.points_ids = [x + offset for x in self.points_ids]
 
     def as_2dm_element(self) -> str:
         """Convert to 2DM format of face."""
