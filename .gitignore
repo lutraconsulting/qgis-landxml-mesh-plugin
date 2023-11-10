@@ -3,3 +3,4 @@ build
 data
 .pytest_cache
 .vscode
+.env
