@@ -40,6 +40,21 @@ class ConvertMesh2LandXML(QgsProcessingAlgorithm):
             QgsProcessingParameterFileDestination(self.OUTPUT, "Output LandXML File", fileFilter="XML File (*.xml)")
         )
 
+    def checkParameterValues(
+        self, parameters: typing.Dict[str, typing.Any], context: QgsProcessingContext
+    ) -> typing.Tuple[bool, str]:
+        crs = None
+
+        mesh_layers = self.parameterAsLayerList(parameters, self.INPUT, context)
+
+        for mesh_layer in mesh_layers:
+            if crs is None:
+                crs = mesh_layer.crs()
+            if crs != mesh_layer.crs():
+                return False, "All input Mesh Layers must have the same CRS."
+
+        return super().checkParameterValues(parameters, context)
+
     def processAlgorithm(
         self, parameters: typing.Dict[str, typing.Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ):
