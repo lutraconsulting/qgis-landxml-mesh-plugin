@@ -3,7 +3,7 @@ import typing
 import xml.etree.ElementTree as ET
 
 from ..text_constants import TextConstants
-import ..utils as utils
+from ..utils import plugin_author, plugin_repository_url, plugin_version
 from .mesh_elements import MeshFace, MeshVertex
 from .xml_formatter import XmlFormatter
 
@@ -56,9 +56,9 @@ class LandXMLWriter:
         attr = {
             "name": "QGIS",
             "desc": f"QGIS `{TextConstants.PLUGIN_NAME}` plugin",
-            "manufacturer": utils.plugin_author(),
-            "version": utils.plugin_version(),
-            "manufacturerURL": TextConstants.PLUGIN_REPO_URL,
+            "manufacturer": plugin_author(),
+            "version": plugin_version(),
+            "manufacturerURL": plugin_repository_url(),
             "timeStamp": "",
         }
 
