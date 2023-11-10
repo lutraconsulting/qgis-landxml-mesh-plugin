@@ -2,6 +2,8 @@ import datetime
 import typing
 import xml.etree.ElementTree as ET
 
+from ..text_constants import TextConstants
+import ..utils as utils
 from .mesh_elements import MeshFace, MeshVertex
 from .xml_formatter import XmlFormatter
 
@@ -52,11 +54,11 @@ class LandXMLWriter:
 
     def create_application(self) -> ET.Element:
         attr = {
-            "name": "Autodesk Civil 3D",
-            "desc": "Civil 3D",
-            "manufacturer": "Autodesk, Inc.",
-            "version": "2023",
-            "manufacturerURL": "www.autodesk.com/civil",
+            "name": "QGIS",
+            "desc": f"QGIS `{TextConstants.PLUGIN_NAME}` plugin",
+            "manufacturer": utils.plugin_author(),
+            "version": utils.plugin_version(),
+            "manufacturerURL": TextConstants.PLUGIN_REPO_URL,
             "timeStamp": "",
         }
 
