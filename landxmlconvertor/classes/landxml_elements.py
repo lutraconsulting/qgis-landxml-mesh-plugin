@@ -84,3 +84,7 @@ class LandXMLSurface:
                     continue
 
             self._faces.append(MeshFace.from_xml_element(i + 1, face_element))
+
+    def empty(self) -> bool:
+        """Checks if the surface is empty - has no vertices."""
+        return len(self._points) == 0
