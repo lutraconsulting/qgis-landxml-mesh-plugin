@@ -143,6 +143,9 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
 
             # if output is 2DM format, just copy
             if mesh_driver == "2DM":
+                dir_name = os.path.dirname(mesh_file)
+                if not os.path.exists(dir_name):
+                    os.mkdir(os.path.dirname(mesh_file))
                 shutil.copy(tmp_2dm_file, mesh_file)
             # else extract mesh and create new using proper driver
             else:
