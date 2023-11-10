@@ -46,7 +46,7 @@ class LandXMLReader:
         points = []
 
         for surface in self.surfaces:
-            points.extend(surface.points)
+            points.extend(surface.points(True))
 
         return points
 
@@ -56,6 +56,6 @@ class LandXMLReader:
         faces = []
 
         for surface in self.surfaces:
-            faces.extend(surface.faces)
+            faces.extend(surface.faces(True))
 
         return faces
