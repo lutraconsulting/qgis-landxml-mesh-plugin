@@ -66,7 +66,7 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
 
         self.addParameter(QgsProcessingParameterEnum(self.MESH_FORMAT, "Output Format", self.driver_names, False, 0))
 
-        self.addParameter(QgsProcessingParameterCrs(self.CRS, "Mesh CRS"))
+        self.addParameter(QgsProcessingParameterCrs(self.CRS, "Mesh CRS", optional=True))
 
         self.addParameter(QgsProcessingParameterFolderDestination(self.OUTPUT, "Output Folder for Mesh files"))
 
