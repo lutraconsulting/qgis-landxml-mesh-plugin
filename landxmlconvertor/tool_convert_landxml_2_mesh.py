@@ -14,7 +14,7 @@ from qgis.core import (
     QgsProcessingParameterCrs,
     QgsProcessingParameterEnum,
     QgsProcessingParameterFile,
-    QgsProcessingParameterFileDestination,
+    QgsProcessingParameterFolderDestination,
     QgsProcessingUtils,
     QgsProviderRegistry,
 )
@@ -57,14 +57,14 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
 
         self.addParameter(QgsProcessingParameterCrs(self.CRS, "Mesh CRS"))
 
-        self.addParameter(QgsProcessingParameterFileDestination(self.OUTPUT, "Output Mesh File"))
+        self.addParameter(QgsProcessingParameterFolderDestination(self.OUTPUT, "Output Folder for Mesh files"))
 
     def processAlgorithm(
         self, parameters: typing.Dict[str, typing.Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ):
         landxml_file = self.parameterAsString(parameters, self.INPUT, context)
 
-        mesh_file = self.parameterAsString(parameters, self.OUTPUT, context)
+        mesh_folder = self.parameterAsString(parameters, self.OUTPUT, context)
 
         mesh_crs = self.parameterAsCrs(parameters, self.CRS, context)
 
