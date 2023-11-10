@@ -70,6 +70,25 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
 
         self.addParameter(QgsProcessingParameterFolderDestination(self.OUTPUT, "Output Folder for Mesh files"))
 
+    def checkParameterValues(
+        self, parameters: typing.Dict[str, typing.Any], context: QgsProcessingContext
+    ) -> typing.Tuple[bool, str]:
+        user_provided_crs = self.parameterAsCrs(parameters, self.CRS, context)
+
+        landxml_file = self.parameterAsString(parameters, self.INPUT, context)
+
+        land_xml = LandXMLReader(landxml_file)
+        land_xml_crs = land_xml.crs()
+
+        if user_provided_crs.isValid() and land_xml_crs.isValid():
+            if user_provided_crs != land_xml_crs:
+                return (
+                    False,
+                    f"User provided CRS `{user_provided_crs.authid()}` differs from LandXML specified CRS `{land_xml_crs.authid()}`.",
+                )
+
+        return super().checkParameterValues(parameters, context)
+
     def processAlgorithm(
         self, parameters: typing.Dict[str, typing.Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ):
