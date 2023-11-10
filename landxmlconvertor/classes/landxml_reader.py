@@ -1,6 +1,8 @@
 import typing
 import xml.etree.ElementTree as ET
 
+from qgis.core import QgsCoordinateReferenceSystem
+
 from . import NS
 from .landxml_elements import LandXMLSurface
 from .mesh_elements import MeshFace, MeshVertex
@@ -19,6 +21,20 @@ class LandXMLReader:
 
         self.surfaces: typing.List[LandXMLSurface] = []
         self._get_surfaces()
+
+    def crs(self) -> QgsCoordinateReferenceSystem:
+        crs_element = self.xml_root.find("landxml:CoordinateSystem", namespaces=NS)
+
+        crs = QgsCoordinateReferenceSystem()
+
+        if isinstance(crs_element, ET.Element):
+            attrs = crs_element.attrib
+            if "epsgCode" in attrs.keys():
+                crs = QgsCoordinateReferenceSystem(f"EPSG:{attrs['epsgCode']}")
+            if "ogcWktCode" in attrs.keys():
+                crs.fromWkt(attrs["ogcWktCode"])
+
+        return crs
 
     @property
     def xml_root(self) -> ET.Element:
