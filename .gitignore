@@ -1,3 +1,5 @@
 .mypy_cache
 build
 data
+.pytest_cache
+.vscode
