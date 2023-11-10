@@ -1,3 +1,4 @@
+import os
 import shutil
 import typing
 import uuid
@@ -11,6 +12,7 @@ from qgis.core import (
     QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingFeedback,
+    QgsProcessingParameterBoolean,
     QgsProcessingParameterCrs,
     QgsProcessingParameterEnum,
     QgsProcessingParameterFile,
@@ -28,6 +30,7 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
     OUTPUT = "OUTPUT"
     MESH_FORMAT = "MESH_FORMAT"
     CRS = "CRS"
+    UNION_SURFACES = "UNION_SURFACES"
 
     mdal_provider_meta = QgsProviderRegistry.instance().providerMetadata("mdal")
 
@@ -53,6 +56,14 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFile(self.INPUT, "Input LandXML File", extension="xml"))
 
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.UNION_SURFACES,
+                "Merge Surfaces into single Mesh (this should not be done if the surfaces overlap)",
+                False,
+            )
+        )
+
         self.addParameter(QgsProcessingParameterEnum(self.MESH_FORMAT, "Output Format", self.driver_names, False, 0))
 
         self.addParameter(QgsProcessingParameterCrs(self.CRS, "Mesh CRS"))
@@ -62,6 +73,8 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
     def processAlgorithm(
         self, parameters: typing.Dict[str, typing.Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback
     ):
+        merge_surfaces = self.parameterAsBoolean(parameters, self.UNION_SURFACES, context)
+
         landxml_file = self.parameterAsString(parameters, self.INPUT, context)
 
         mesh_folder = self.parameterAsString(parameters, self.OUTPUT, context)
@@ -71,36 +84,78 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
         driverIndex = self.parameterAsEnum(parameters, self.MESH_FORMAT, context)
         mesh_driver = self.driver_names[driverIndex]
 
-        mesh_file = QgsFileUtils.ensureFileNameHasExtension(mesh_file, [self.driver_suffixes[driverIndex]])
-
-        tmp_2dm_file = QgsProcessingUtils.generateTempFilename(f"{uuid.uuid4()}.2dm")
-
-        # create temp 2DM file and load it as layer
         land_xml = LandXMLReader(landxml_file)
 
-        mesh_2dm_writer = Mesh2DMWriter(land_xml.all_points, land_xml.all_faces)
+        if merge_surfaces:
+            name, _ = os.path.splitext(landxml_file)
+            mesh_file = QgsFileUtils.ensureFileNameHasExtension(name, [self.driver_suffixes[driverIndex]])
 
-        mesh_2dm_writer.write(tmp_2dm_file)
+            mesh_file = os.path.join(mesh_folder, mesh_file)
 
-        feedback.pushInfo(f"Temp 2dm file saved: {tmp_2dm_file}")
+            tmp_2dm_file = QgsProcessingUtils.generateTempFilename(f"{uuid.uuid4()}.2dm")
 
-        mesh_layer = QgsMeshLayer(tmp_2dm_file, "temp mesh layer", "mdal")
+            # create temp 2DM file and load it as layer
 
-        # if output is 2DM format, just copy
-        if mesh_driver == "2DM":
-            shutil.copy(tmp_2dm_file, mesh_file)
-        # else extract mesh and create new using proper driver
+            mesh_2dm_writer = Mesh2DMWriter(land_xml.all_points, land_xml.all_faces)
+
+            mesh_2dm_writer.write(tmp_2dm_file)
+
+            feedback.pushInfo(f"Temp 2dm file saved: {tmp_2dm_file}")
+
+            mesh_layer = QgsMeshLayer(tmp_2dm_file, "temp mesh layer", "mdal")
+
+            # if output is 2DM format, just copy
+            if mesh_driver == "2DM":
+                shutil.copy(tmp_2dm_file, mesh_file)
+            # else extract mesh and create new using proper driver
+            else:
+                mesh = QgsMesh()
+                mesh_layer.dataProvider().populateMesh(mesh)
+
+                self.mdal_provider_meta.createMeshData(
+                    mesh=mesh, fileName=mesh_file, driverName=mesh_driver, crs=mesh_crs
+                )
+
+            context.addLayerToLoadOnCompletion(
+                mesh_file,
+                QgsProcessingContext.LayerDetails(name, context.project(), name, QgsProcessingUtils.LayerHint.Mesh),
+            )
+
         else:
-            mesh = QgsMesh()
-            mesh_layer.dataProvider().populateMesh(mesh)
+            for surface in land_xml.surfaces:
+                mesh_file = QgsFileUtils.ensureFileNameHasExtension(surface.name, [self.driver_suffixes[driverIndex]])
 
-            self.mdal_provider_meta.createMeshData(mesh=mesh, fileName=mesh_file, driverName=mesh_driver, crs=mesh_crs)
+                mesh_file = os.path.join(mesh_folder, mesh_file)
 
-        context.addLayerToLoadOnCompletion(
-            mesh_file,
-            QgsProcessingContext.LayerDetails(
-                "LandXML Mesh", context.project(), "LandXML", QgsProcessingUtils.LayerHint.Mesh
-            ),
-        )
+                tmp_2dm_file = QgsProcessingUtils.generateTempFilename(f"{uuid.uuid4()}.2dm")
 
-        return {self.OUTPUT: mesh_file}
+                # create temp 2DM file and load it as layer
+
+                mesh_2dm_writer = Mesh2DMWriter(surface.points(), surface.faces())
+
+                mesh_2dm_writer.write(tmp_2dm_file)
+
+                feedback.pushInfo(f"Temp 2dm file saved: {tmp_2dm_file}")
+
+                mesh_layer = QgsMeshLayer(tmp_2dm_file, "temp mesh layer", "mdal")
+
+                # if output is 2DM format, just copy
+                if mesh_driver == "2DM":
+                    shutil.copy(tmp_2dm_file, mesh_file)
+                # else extract mesh and create new using proper driver
+                else:
+                    mesh = QgsMesh()
+                    mesh_layer.dataProvider().populateMesh(mesh)
+
+                    self.mdal_provider_meta.createMeshData(
+                        mesh=mesh, fileName=mesh_file, driverName=mesh_driver, crs=mesh_crs
+                    )
+
+                context.addLayerToLoadOnCompletion(
+                    mesh_file,
+                    QgsProcessingContext.LayerDetails(
+                        surface.name, context.project(), surface.name, QgsProcessingUtils.LayerHint.Mesh
+                    ),
+                )
+
+        return {self.OUTPUT: mesh_folder}
