@@ -156,6 +156,8 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
                     mesh=mesh, fileName=mesh_file, driverName=mesh_driver, crs=mesh_crs
                 )
 
+            feedback.pushInfo(f"Output file saved: {mesh_file}")
+
             context.addLayerToLoadOnCompletion(
                 mesh_file,
                 QgsProcessingContext.LayerDetails(name, context.project(), name, QgsProcessingUtils.LayerHint.Mesh),
@@ -193,6 +195,8 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
                     self.mdal_provider_meta.createMeshData(
                         mesh=mesh, fileName=mesh_file, driverName=mesh_driver, crs=mesh_crs
                     )
+
+                feedback.pushInfo(f"Output file saved: {mesh_file}")
 
                 context.addLayerToLoadOnCompletion(
                     mesh_file,
