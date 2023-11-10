@@ -2,10 +2,20 @@ import datetime
 import typing
 import xml.etree.ElementTree as ET
 
-from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsUnitTypes
+from qgis.core import (
+    Qgis,
+    QgsCoordinateReferenceSystem,
+    QgsMesh,
+    QgsMeshLayer,
+    QgsProcessingUtils,
+    QgsProviderRegistry,
+    QgsUnitTypes,
+)
 
 from ..text_constants import TextConstants
 from ..utils import plugin_author, plugin_repository_url, plugin_version
+from . import NS
+from .mesh2dm_reader import Mesh2DMReader
 from .mesh_elements import MeshFace, MeshVertex
 from .xml_formatter import XmlFormatter
 
@@ -112,3 +122,21 @@ class LandXMLWriter:
         text = XmlFormatter.elementToPrettyXml(self.LandXML)
         with open(file_name, "w", encoding="utf-8") as file:
             file.write(text.decode("utf-8"))
+
+    def add_surface(self, mesh_layer: QgsMeshLayer) -> None:
+        mdal_provider_meta = QgsProviderRegistry.instance().providerMetadata("mdal")
+
+        tmp_2dm_file = QgsProcessingUtils.generateTempFilename(f"{mesh_layer.id()}.2dm")
+
+        # create temp 2D file
+        mesh = QgsMesh()
+        mesh_layer.dataProvider().populateMesh(mesh)
+
+        mdal_provider_meta.createMeshData(mesh=mesh, fileName=tmp_2dm_file, driverName="2DM", crs=mesh_layer.crs())
+
+        # read the file to format, that holds points and faces
+        mesh_2dm_reader = Mesh2DMReader(tmp_2dm_file)
+
+        elem_surface = self._create_surface(mesh_layer.name(), mesh_2dm_reader.points, mesh_2dm_reader.faces)
+
+        self.surfaces_elem.append(elem_surface)
