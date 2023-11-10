@@ -23,12 +23,10 @@ class MeshVertex:
         return elem
 
     @classmethod
-    def from_xml_element(cls, element: ET.Element, id_prefix: int = None):
+    def from_xml_element(cls, element: ET.Element):
         """Read from LandXML element."""
-        if id_prefix is None:
-            vertex_id = int(element.attrib["id"])
-        else:
-            vertex_id = id_prefix + int(element.attrib["id"])
+
+        vertex_id = int(element.attrib["id"])
 
         y, x, z = element.text.split(" ")
 
@@ -72,17 +70,16 @@ class MeshFace:
         return elem
 
     @classmethod
-    def from_xml_element(cls, face_id: int, face_element: ET.Element, id_prefix: int = 0):
+    def from_xml_element(cls, face_id: int, face_element: ET.Element):
         """Read from LandXML element."""
 
-        face_id = face_id + id_prefix
-
+        face_id = face_id
         points_ids_text = face_element.text.split(" ")
 
         point_ids: typing.List[int] = []
 
         for point_id in points_ids_text:
-            point_ids.append(id_prefix + int(point_id))
+            point_ids.append(int(point_id))
 
         return cls(face_id, point_ids)
 
