@@ -44,6 +44,10 @@ class LandXMLWriter:
 
         self.units = ET.SubElement(self.root_element, "Units")
         self.units.append(self.create_unit())
+
+        if crs.isValid():
+            self.root_element.append(self.create_crs())
+
         self.root_element.append(self.create_application())
         self.surfaces_elem = ET.Element("Surfaces")
         self.root_element.append(self.surfaces_elem)
@@ -51,6 +55,19 @@ class LandXMLWriter:
     @property
     def LandXML(self) -> ET.Element:
         return self.root_element
+
+    def create_crs(self) -> ET.Element:
+        attr = {
+            "ogcWktCode": self.crs.toWkt(QgsCoordinateReferenceSystem.WktVariant.WKT_PREFERRED, False),
+            "desc": self.crs.description(),
+        }
+        crs_auth_id = self.crs.authid()
+        if "EPSG" in crs_auth_id:
+            attr["epsgCode"] = crs_auth_id.replace("EPSG:", "")
+
+        elem = ET.Element("CoordinateSystem", attrib=attr)
+
+        return elem
 
     def create_unit(self) -> ET.Element:
         unit_type = "Metric"
