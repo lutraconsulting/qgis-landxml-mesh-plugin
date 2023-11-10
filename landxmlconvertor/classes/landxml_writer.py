@@ -14,7 +14,6 @@ from qgis.core import (
 
 from ..text_constants import TextConstants
 from ..utils import plugin_author, plugin_repository_url, plugin_version
-from . import NS
 from .mesh2dm_reader import Mesh2DMReader
 from .mesh_elements import MeshFace, MeshVertex
 from .xml_formatter import XmlFormatter
