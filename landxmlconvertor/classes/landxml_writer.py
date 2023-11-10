@@ -41,7 +41,8 @@ class LandXMLWriter:
         self.units = ET.SubElement(self.root_element, "Units")
         self.units.append(self.create_unit())
         self.root_element.append(self.create_application())
-        self.root_element.append(self.create_surfaces())
+        self.surfaces_elem = ET.Element("Surfaces")
+        self.root_element.append(self.surfaces_elem)
 
     @property
     def LandXML(self) -> ET.Element:
