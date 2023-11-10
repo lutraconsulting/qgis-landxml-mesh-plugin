@@ -52,12 +52,3 @@ class LandXMLSurface:
 
         for i, face_element in enumerate(faces.findall("landxml:F", namespaces=NS)):
             self.faces.append(MeshFace.from_xml_element(i + 1, face_element, self.id_prefix))
-
-    def points_as_2dm(self) -> str:
-        return "\n".join([x.as_2dm_element() for x in self.points])
-
-    def faces_as_2dm(self) -> str:
-        return "\n".join([x.as_2dm_element() for x in self.faces])
-
-    def as_2dm(self) -> str:
-        return f"MESH2D\n{self.points_as_2dm()}\n{self.faces_as_2dm()}"
