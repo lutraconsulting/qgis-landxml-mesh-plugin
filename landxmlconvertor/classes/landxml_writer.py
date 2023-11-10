@@ -25,13 +25,8 @@ class LandXMLWriter:
 
     def __init__(
         self,
-        points: typing.List[MeshVertex],
-        faces: typing.List[MeshFace],
         crs: QgsCoordinateReferenceSystem = QgsCoordinateReferenceSystem(),
     ) -> None:
-        self.points = points
-        self.faces = faces
-
         self.crs = crs
 
         self.root_element = ET.Element(
