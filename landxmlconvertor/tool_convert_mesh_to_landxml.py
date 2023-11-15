@@ -7,7 +7,6 @@ from qgis.core import (
     QgsProcessingException,
     QgsProcessingFeedback,
     QgsProcessingParameterFileDestination,
-    QgsProcessingParameterMeshLayer,
     QgsProcessingParameterMultipleLayers,
     QgsProviderRegistry,
 )
