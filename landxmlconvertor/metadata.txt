@@ -2,7 +2,7 @@
 name=LandXML to Mesh
 description=Conversion of LandXML to Mesh and vice versa 
 about=Conversion of LandXML to Mesh and vice versa
-version=0.1.0
+version=0.1.1
 qgisMinimumVersion=3.32
 qgisMaximumVersion=3.99
 author=Lutra Consulting
