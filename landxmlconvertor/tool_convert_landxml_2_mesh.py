@@ -79,8 +79,8 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
 
         try:
             land_xml = LandXMLReader(landxml_file)
-        except ValueError:
-            return False, "The provided file is not a valid LandXML file."
+        except ValueError as e:
+            return False, f"Input file error.\n{str(e)}"
 
         if land_xml.surface_count == 0:
             return False, "No surfaces in the LandXML file. Nothing to extract."
