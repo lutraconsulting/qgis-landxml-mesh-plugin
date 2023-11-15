@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 
 from qgis.core import QgsCoordinateReferenceSystem
 
-from . import NS
+from . import get_namespace
 from .landxml_elements import LandXMLSurface
 from .mesh_elements import MeshFace, MeshVertex
 
@@ -23,11 +23,16 @@ class LandXMLReader:
         if not "LandXML".lower() in self.xml_root.tag.lower():
             raise ValueError("Not a valid LandXML file.")
 
+        namespace_name, self.namespace = get_namespace(self.xml_root)
+        self.namespace_prefix = ""
+        if namespace_name:
+            self.namespace_prefix = f"{namespace_name}:"
+
         self.surfaces: typing.List[LandXMLSurface] = []
         self._get_surfaces()
 
     def crs(self) -> QgsCoordinateReferenceSystem:
-        crs_element = self.xml_root.find("landxml:CoordinateSystem", namespaces=NS)
+        crs_element = self.xml_root.find(f"{self.namespace_prefix}CoordinateSystem", namespaces=self.namespace)
 
         crs = QgsCoordinateReferenceSystem()
 
@@ -55,10 +60,12 @@ class LandXMLReader:
         return self.surfaces[surface_number].faces()
 
     def _get_surfaces(self) -> None:
-        surfaces = self.xml_root.find("landxml:Surfaces", namespaces=NS)
+        surfaces = self.xml_root.find(f"{self.namespace_prefix}Surfaces", namespaces=self.namespace)
         if surfaces:
             for i, surface in enumerate(surfaces):
-                self.surfaces.append(LandXMLSurface(surface, i, i * self.SURFACE_VERTEX_ID_OFFSET))
+                self.surfaces.append(
+                    LandXMLSurface(surface, i, i * self.SURFACE_VERTEX_ID_OFFSET, self.namespace_prefix, self.namespace)
+                )
 
     @property
     def all_points(self) -> typing.List[MeshVertex]:
