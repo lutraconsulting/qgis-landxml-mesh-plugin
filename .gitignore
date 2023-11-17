@@ -1,3 +1,6 @@
 .mypy_cache
 build
-data
+/data
+.pytest_cache
+.vscode
+.env

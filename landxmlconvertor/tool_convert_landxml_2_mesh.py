@@ -77,7 +77,17 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
 
         landxml_file = self.parameterAsString(parameters, self.INPUT, context)
 
-        land_xml = LandXMLReader(landxml_file)
+        try:
+            land_xml = LandXMLReader(landxml_file)
+        except ValueError as e:
+            return False, f"Input file error.\n{str(e)}"
+
+        if land_xml.surface_count == 0:
+            return False, "No surfaces in the LandXML file. Nothing to extract."
+
+        if all([x.empty() for x in land_xml.surfaces]):
+            return False, "All surfaces in the LandXML file are empty."
+
         land_xml_crs = land_xml.crs()
 
         if user_provided_crs.isValid() and land_xml_crs.isValid():
@@ -133,6 +143,9 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
 
             # if output is 2DM format, just copy
             if mesh_driver == "2DM":
+                dir_name = os.path.dirname(mesh_file)
+                if not os.path.exists(dir_name):
+                    os.mkdir(os.path.dirname(mesh_file))
                 shutil.copy(tmp_2dm_file, mesh_file)
             # else extract mesh and create new using proper driver
             else:
@@ -142,6 +155,8 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
                 self.mdal_provider_meta.createMeshData(
                     mesh=mesh, fileName=mesh_file, driverName=mesh_driver, crs=mesh_crs
                 )
+
+            feedback.pushInfo(f"Output file saved: {mesh_file}")
 
             context.addLayerToLoadOnCompletion(
                 mesh_file,
@@ -180,6 +195,8 @@ class ConvertLandXML2Mesh(QgsProcessingAlgorithm):
                     self.mdal_provider_meta.createMeshData(
                         mesh=mesh, fileName=mesh_file, driverName=mesh_driver, crs=mesh_crs
                     )
+
+                feedback.pushInfo(f"Output file saved: {mesh_file}")
 
                 context.addLayerToLoadOnCompletion(
                     mesh_file,
