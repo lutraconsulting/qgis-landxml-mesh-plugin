@@ -8,3 +8,5 @@ qgisMaximumVersion=3.99
 author=Lutra Consulting
 email=info@lutraconsulting.co.uk
 repository=https://github.com/lutraconsulting/qgis-landxml-mesh-plugin
+tracker=https://github.com/lutraconsulting/qgis-landxml-mesh-plugin/issues
+homepage=https://github.com/lutraconsulting/qgis-landxml-mesh-plugin
