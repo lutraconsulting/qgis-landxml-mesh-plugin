@@ -1,0 +1,37 @@
+name: Tests for Plugin LandXML to Mesh
+
+on:
+  push:
+    paths:
+    - "landxmlconvertor/**"
+    - ".github/workflows/test_plugin.yaml"
+    - "tests/**"
+
+jobs:
+
+  Tests-plugin-LandXML-to-Mesh:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Install QGIS
+        run: |
+          sudo wget -qO /etc/apt/keyrings/qgis-archive-keyring.gpg https://download.qgis.org/downloads/qgis-archive-keyring.gpg
+          sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/qgis-archive-keyring.gpg] https://qgis.org/ubuntu `lsb_release -c -s` main" > /etc/apt/sources.list.d/qgis.list'
+          sudo apt-get update
+          sudo apt-get install -y qgis
+            
+      - name: Install Python packages
+        run: pip install pytest pytest-qgis
+
+      - name: Set PYTHONPATH
+        run: |
+          echo "PYTHONPATH=/usr/share/qgis/python/plugins:/usr/share/qgis/python:." >> $GITHUB_ENV
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Tests
+        run: |
+          QT_QPA_PLATFORM=offscreen pytest tests -rP -vv -s

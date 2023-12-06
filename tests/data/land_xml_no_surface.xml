@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<LandXML xmlns="http://www.landxml.org/schema/LandXML-1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.landxml.org/schema/LandXML-1.2 http://www.landxml.org/schema/LandXML-1.2/LandXML-1.2.xsd" date="2023-05-16" time="09:38:53" version="1.2" language="English" readOnly="false">
+	<Units>
+		<Metric areaUnit="squareMeter" linearUnit="meter" volumeUnit="cubicMeter" temperatureUnit="celsius" pressureUnit="milliBars" diameterUnit="millimeter" angularUnit="decimal degrees" directionUnit="decimal degrees"></Metric>
+	</Units>
+	<Project name=""></Project>
+	<Application name="QGIS" desc="QGIS `LandXML to Mesh` plugin" manufacturer="Lutra Consulting" version="0.1.0" manufacturerURL="https://github.com/lutraconsulting/qgis-landxml-mesh-plugin" timeStamp=""/>
+	<Surfaces>
+	</Surfaces>
+</LandXML>
